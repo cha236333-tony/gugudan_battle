@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>몬스터 구구단 배틀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 홈 시작 화면 (전체 덮기) -->
+        <div id="home-screen" class="home-overlay active">
+            <div class="home-content glass-panel">
+                <h1 class="title">🏆 몬스터<br>구구단 배틀 🏆</h1>
+                <p class="subtitle">구구단을 외워 몬스터를 물리치자!</p>
+
+                <!-- 모드 선택 영역 -->
+                <div class="mode-select">
+                    <h3 class="mode-title">🎮 게임 모드 선택</h3>
+                    <div class="mode-buttons">
+                        <button id="btn-mode-mix" class="mode-btn active" data-mode="mix">
+                            <span class="mode-icon">🔀</span>
+                            <span class="mode-label">전체 랜덤</span>
+                            <span class="mode-desc">2~9단 섞기</span>
+                        </button>
+                        <button id="btn-mode-single" class="mode-btn" data-mode="single">
+                            <span class="mode-icon">🎯</span>
+                            <span class="mode-label">단수 선택</span>
+                            <span class="mode-desc">집중 연습</span>
+                        </button>
+                    </div>
+
+                    <!-- 단수 선택 그리드 (단수 선택 모드일 때만 표시) -->
+                    <div id="dan-select" class="dan-select hidden">
+                        <p class="dan-select-title">📐 연습할 단을 선택하세요</p>
+                        <div class="dan-grid">
+                            <button class="dan-btn" data-dan="2">2단</button>
+                            <button class="dan-btn" data-dan="3">3단</button>
+                            <button class="dan-btn" data-dan="4">4단</button>
+                            <button class="dan-btn" data-dan="5">5단</button>
+                            <button class="dan-btn" data-dan="6">6단</button>
+                            <button class="dan-btn" data-dan="7">7단</button>
+                            <button class="dan-btn" data-dan="8">8단</button>
+                            <button class="dan-btn" data-dan="9">9단</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btn-start" class="btn-primary">⚔️ 게임 시작</button>
+            </div>
+        </div>
+
+        <!-- 메인 게임 UI (좌: 배틀, 우: 상점/도감) -->
+        <main id="main-ui" class="main-layout hidden">
+            <!-- 왼쪽 파트 (배틀) -->
+            <section id="battle-section" class="battle-panel">
+                <header class="top-bar">
+                    <div class="stat"><span class="icon">❤️</span> <span id="player-hp">100</span> / 100</div>
+                    <div class="stat"><span class="icon">🪙</span> <span id="player-gold">0</span></div>
+                </header>
+
+                <div class="battle-arena">
+                    <div id="monster-info" class="monster-card glass-panel">
+                        <h2 id="monster-name">슬라임</h2>
+                        <div id="monster-emoji" class="emoji-large">💧</div>
+                        <div class="hp-bar-container">
+                            <div id="monster-hp-fill" class="hp-fill"></div>
+                        </div>
+                        <div id="monster-hp-text">HP: 20/20</div>
+                        <div id="combo-text" class="combo-text hidden">2 Combo!</div>
+                        <div id="damage-text" class="damage-text"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-area glass-panel">
+                    <h3 id="quiz-question">2 x 3 = ?</h3>
+                    <div id="quiz-options" class="options-grid">
+                        <!-- 버튼들이 JS로 생성됨 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 오른쪽 파트 (상점 및 도감) -->
+            <aside id="side-section" class="side-panel">
+                <nav class="side-tabs">
+                    <button id="tab-shop" class="tab-btn active">🛒 상점/뽑기</button>
+                    <button id="tab-encyclopedia" class="tab-btn">📖 도감</button>
+                </nav>
+
+                <!-- 상점 내용 -->
+                <div id="shop-content" class="tab-content active glass-panel">
+                    <header class="side-header">
+                        <h2>🌟 신비한 상점 🌟</h2>
+                    </header>
+                    <p class="desc">골드를 사용해 희귀한 아이템을 뽑아보세요!</p>
+                    <div class="gacha-area">
+                        <button id="btn-gacha" class="btn-primary">뽑기 (100 🪙)</button>
+                        <div id="gacha-result" class="gacha-result hidden">
+                            <!-- 뽑기 결과 이모지 -->
+                        </div>
+                    </div>
+                    <h3>내 인벤토리</h3>
+                    <div id="inventory-list" class="inventory-grid">
+                        <!-- 획득한 아이템 표시 -->
+                    </div>
+                </div>
+
+                <!-- 도감 내용 -->
+                <div id="encyclopedia-content" class="tab-content glass-panel">
+                    <header class="side-header">
+                        <h2>📖 몬스터 도감</h2>
+                        <div class="stat">수집률: <span id="collection-rate">0</span>%</div>
+                    </header>
+                    <div id="encyclopedia-grid" class="monster-grid">
+                        <!-- 몬스터 도감 항목 표시 -->
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- 사운드 이펙트 -->
+    <audio id="sfx-correct" src="https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3"></audio>
+    <audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+    <audio id="sfx-gacha" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+    <!-- 커스텀 토스트 알림 컨테이너 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Twemoji 렌더링 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/twemoji.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
