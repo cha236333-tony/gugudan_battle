@@ -19,7 +19,7 @@
 
                 <!-- 모드 선택 영역 -->
                 <div class="mode-select">
-                    <h3 class="mode-title">🎮 게임 모드 선택</h3>
+                    <h3 class="mode-title">🎮 문제 범위 선택</h3>
                     <div class="mode-buttons">
                         <button id="btn-mode-mix" class="mode-btn active" data-mode="mix">
                             <span class="mode-icon">🔀</span>
@@ -46,6 +46,22 @@
                             <button class="dan-btn" data-dan="8">8단</button>
                             <button class="dan-btn" data-dan="9">9단</button>
                         </div>
+                    </div>
+
+                    <h3 class="mode-title" style="margin-top:20px;">📝 문제 유형 선택</h3>
+                    <div class="mode-buttons">
+                        <button id="btn-type-multiple" class="mode-btn active" data-type="multiple">
+                            <span class="mode-icon">☑️</span>
+                            <span class="mode-label">객관식</span>
+                        </button>
+                        <button id="btn-type-subjective" class="mode-btn" data-type="subjective">
+                            <span class="mode-icon">⌨️</span>
+                            <span class="mode-label">주관식</span>
+                        </button>
+                        <button id="btn-type-mixed" class="mode-btn" data-type="mixed">
+                            <span class="mode-icon">🔀</span>
+                            <span class="mode-label">혼합</span>
+                        </button>
                     </div>
                 </div>
 
@@ -79,6 +95,10 @@
                     <h3 id="quiz-question">2 x 3 = ?</h3>
                     <div id="quiz-options" class="options-grid">
                         <!-- 버튼들이 JS로 생성됨 -->
+                    </div>
+                    <div id="quiz-input-area" class="hidden">
+                        <input type="number" id="quiz-input" placeholder="정답 입력" autocomplete="off">
+                        <button id="btn-submit-answer" class="btn-primary" style="margin-top:10px; padding:10px 20px; width:auto;">제출</button>
                     </div>
                 </div>
             </section>
@@ -124,7 +144,7 @@
 
     <!-- 사운드 이펙트 (밝고 경쾌한 아케이드 톤으로 교체) -->
     <audio id="sfx-correct" src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3"></audio>
-    <audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/2997/2997-preview.mp3"></audio>
+    <audio id="sfx-wrong" src="https://assets.mixkit.co/active_storage/sfx/3144/3144-preview.mp3"></audio>
     <audio id="sfx-gacha" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <!-- 커스텀 토스트 알림 컨테이너 -->

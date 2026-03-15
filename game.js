@@ -27,6 +27,8 @@ const gachaItems = [
 // 게임 모드 상태
 let gameMode = 'mix'; // 'mix' = 전체 랜덤, 'single' = 특정 단 선택
 let selectedDan = 2;  // 특정 단 선택 모드일 때 사용할 단수
+let questionType = 'multiple'; // 'multiple' = 객관식, 'subjective' = 주관식, 'mixed' = 혼합
+let currentQuestionMode = 'multiple'; // 현재 문제의 유형
 
 // 게임 상태
 let player = {
@@ -57,6 +59,11 @@ const UI = {
     damageText: document.getElementById('damage-text'),
     quizQuestion: document.getElementById('quiz-question'),
     quizOptions: document.getElementById('quiz-options'),
+    
+    // Quiz Input
+    quizInputArea: document.getElementById('quiz-input-area'),
+    quizInput: document.getElementById('quiz-input'),
+    btnSubmitAnswer: document.getElementById('btn-submit-answer'),
     
     // Side Tabs
     tabShop: document.getElementById('tab-shop'),
@@ -143,6 +150,12 @@ function init() {
     // 모드 선택 이벤트 리스너
     setupModeSelection();
     
+    // 주관식 입력 제출 이벤트
+    UI.btnSubmitAnswer.addEventListener('click', handleSubjectiveSubmit);
+    UI.quizInput.addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') handleSubjectiveSubmit();
+    });
+    
     // 시작 시 홈 스크린 표시, 메인 UI 숨김
     UI.homeScreen.classList.add('active');
     UI.mainUi.classList.add('hidden');
@@ -151,12 +164,32 @@ function init() {
     applyTwemoji(document.body);
 }
 
+function handleSubjectiveSubmit() {
+    const val = parseInt(UI.quizInput.value);
+    if (!isNaN(val)) {
+        handleAnswer(val === currentCorrectAnswer);
+        UI.quizInput.value = '';
+    } else {
+        showToast("숫자를 입력해주세요!", "⚠️");
+    }
+}
+
 // 모드 선택 UI 로직
 function setupModeSelection() {
     const btnModeMix = document.getElementById('btn-mode-mix');
     const btnModeSingle = document.getElementById('btn-mode-single');
     const danSelect = document.getElementById('dan-select');
     const danBtns = document.querySelectorAll('.dan-btn');
+    
+    // 유형 선택
+    const typeBtns = document.querySelectorAll('#btn-type-multiple, #btn-type-subjective, #btn-type-mixed');
+    typeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            typeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            questionType = btn.dataset.type;
+        });
+    });
     
     // 전체 랜덤 모드 선택
     btnModeMix.addEventListener('click', () => {
@@ -257,38 +290,56 @@ function generateQuiz() {
     
     UI.quizQuestion.textContent = `${num1} × ${num2} = ?`;
     
-    // 오답 3개 생성
-    let options = new Set();
-    options.add(currentCorrectAnswer);
-    
-    while(options.size < 4) {
-        let wrongNum1, wrongNum2;
-        if (gameMode === 'single') {
-            // 같은 단에서 오답 생성 (더 헷갈리게)
-            wrongNum1 = selectedDan;
-            wrongNum2 = Math.floor(Math.random() * 9) + 1;
-        } else {
-            wrongNum1 = Math.floor(Math.random() * 8) + 2;
-            wrongNum2 = Math.floor(Math.random() * 9) + 1;
-        }
-        let wrongAnswer = wrongNum1 * wrongNum2;
-        if (wrongAnswer !== currentCorrectAnswer) {
-            options.add(wrongAnswer);
-        }
+    // 유형 확인 및 설정
+    if (questionType === 'mixed') {
+        currentQuestionMode = Math.random() > 0.5 ? 'multiple' : 'subjective';
+    } else {
+        currentQuestionMode = questionType;
     }
-    
-    // 배열로 변환 후 셔플
-    let optionsArray = Array.from(options).sort(() => Math.random() - 0.5);
-    
-    // UI 렌더링
-    UI.quizOptions.innerHTML = '';
-    optionsArray.forEach(opt => {
-        let btn = document.createElement('button');
-        btn.classList.add('option-btn');
-        btn.textContent = opt;
-        btn.onclick = () => handleAnswer(opt === currentCorrectAnswer);
-        UI.quizOptions.appendChild(btn);
-    });
+
+    if (currentQuestionMode === 'multiple') {
+        UI.quizOptions.classList.remove('hidden');
+        UI.quizInputArea.classList.add('hidden');
+
+        // 오답 3개 생성
+        let options = new Set();
+        options.add(currentCorrectAnswer);
+        
+        while(options.size < 4) {
+            let wrongNum1, wrongNum2;
+            if (gameMode === 'single') {
+                // 같은 단에서 오답 생성 (더 헷갈리게)
+                wrongNum1 = selectedDan;
+                wrongNum2 = Math.floor(Math.random() * 9) + 1;
+            } else {
+                wrongNum1 = Math.floor(Math.random() * 8) + 2;
+                wrongNum2 = Math.floor(Math.random() * 9) + 1;
+            }
+            let wrongAnswer = wrongNum1 * wrongNum2;
+            if (wrongAnswer !== currentCorrectAnswer) {
+                options.add(wrongAnswer);
+            }
+        }
+        
+        // 배열로 변환 후 셔플
+        let optionsArray = Array.from(options).sort(() => Math.random() - 0.5);
+        
+        // UI 렌더링
+        UI.quizOptions.innerHTML = '';
+        optionsArray.forEach(opt => {
+            let btn = document.createElement('button');
+            btn.classList.add('option-btn');
+            btn.textContent = opt;
+            btn.onclick = () => handleAnswer(opt === currentCorrectAnswer);
+            UI.quizOptions.appendChild(btn);
+        });
+    } else {
+        // 주관식
+        UI.quizOptions.classList.add('hidden');
+        UI.quizInputArea.classList.remove('hidden');
+        UI.quizInput.value = '';
+        setTimeout(() => UI.quizInput.focus(), 50);
+    }
     
     // 현재 모드 배지 업데이트
     updateModeBadge();
@@ -358,7 +409,7 @@ function handleAnswer(isCorrect) {
         
         // 앱 배경 전체 빨갛게 피격효과
         UI.app.classList.add('anim-screen-red');
-        setTimeout(() => UI.app.classList.remove('anim-screen-red'), 150);
+        setTimeout(() => UI.app.classList.remove('anim-screen-red'), 400);
         
         if (player.hp <= 0) {
             player.hp = 0;
@@ -449,13 +500,34 @@ function pullGacha() {
 
 function renderInventory() {
     UI.inventoryList.innerHTML = '';
-    player.inventory.forEach(emoji => {
+    player.inventory.forEach((emoji, index) => {
         const div = document.createElement('div');
         div.className = 'item-slot';
         div.textContent = emoji;
+        div.onclick = () => useItem(index);
         UI.inventoryList.appendChild(div);
     });
     applyTwemoji(UI.inventoryList);
+}
+
+function useItem(index) {
+    const itemEmoji = player.inventory[index];
+    const itemData = gachaItems.find(i => i.emoji === itemEmoji);
+
+    if (itemData) {
+        if (itemData.type === '포션') {
+            const healAmount = 30;
+            player.hp = Math.min(player.maxHp, player.hp + healAmount);
+            updatePlayerUI();
+            showToast(`${itemData.name} 사용! 체력을 ${healAmount} 회복했습니다.`, '💚');
+            
+            // 소모
+            player.inventory.splice(index, 1);
+            renderInventory();
+        } else {
+            showToast(`${itemData.name} 장착 완료!`, itemData.emoji);
+        }
+    }
 }
 
 // 도감 렌더링 로직

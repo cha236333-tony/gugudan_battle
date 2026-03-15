@@ -166,6 +166,31 @@ button {
     gap: 10px;
 }
 
+#quiz-input-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#quiz-input {
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    border: 3px solid var(--primary-color);
+    text-align: center;
+    width: 60%;
+    outline: none;
+    font-weight: bold;
+    background: rgba(255,255,255,0.9);
+}
+
+#quiz-input:focus {
+    border-color: var(--primary-hover);
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+}
+
 /* 정답 버튼 스타일 및 액티브(클릭) 효과 개선 */
 .option-btn {
     background: rgba(255, 255, 255, 0.9);
@@ -339,6 +364,13 @@ button {
     border-radius: 8px;
     padding: 10px;
     font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+}
+
+.item-slot:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.9);
 }
 
 /* Encyclopedia */
@@ -395,7 +427,21 @@ button {
 
 .anim-shake { animation: shake 0.4s ease-in-out; }
 .anim-damage { animation: damagePop 1s ease-out forwards; }
-.anim-screen-red { box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.5); transition: 0.1s; border-radius: 20px;}
+.anim-screen-red {
+    box-shadow: inset 0 0 200px rgba(255, 0, 0, 0.8);
+    transition: box-shadow 0.1s;
+    border-radius: 20px;
+    animation: heavyShake 0.4s ease-in-out;
+}
+
+@keyframes heavyShake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    20% { transform: translate(-15px, 15px) rotate(-3deg); }
+    40% { transform: translate(15px, -15px) rotate(3deg); }
+    60% { transform: translate(-15px, -15px) rotate(-3deg); }
+    80% { transform: translate(15px, 15px) rotate(3deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+}
 
 /* ===== 모드 선택 UI ===== */
 .mode-select {
