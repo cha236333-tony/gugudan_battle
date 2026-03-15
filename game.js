@@ -78,7 +78,12 @@ const UI = {
     
     // Encyclopedia
     encyclopediaGrid: document.getElementById('encyclopedia-grid'),
-    collectionRate: document.getElementById('collection-rate')
+    collectionRate: document.getElementById('collection-rate'),
+    
+    // Settings Modal
+    settingsModal: document.getElementById('settings-modal'),
+    btnOpenSettings: document.getElementById('btn-open-settings'),
+    btnCloseSettings: document.getElementById('btn-close-settings')
 };
 
 // 오디오 재생 헬퍼
@@ -156,6 +161,19 @@ function init() {
         if(e.key === 'Enter') handleSubjectiveSubmit();
     });
     
+    // 인게임 설정 모달 이벤트
+    if(UI.btnOpenSettings) {
+        UI.btnOpenSettings.addEventListener('click', () => {
+            UI.settingsModal.classList.remove('hidden');
+        });
+    }
+    if(UI.btnCloseSettings) {
+        UI.btnCloseSettings.addEventListener('click', () => {
+            UI.settingsModal.classList.add('hidden');
+            generateQuiz(); // 변경된 설정 즉시 반영
+        });
+    }
+    
     // 시작 시 홈 스크린 표시, 메인 UI 숨김
     UI.homeScreen.classList.add('active');
     UI.mainUi.classList.add('hidden');
@@ -176,49 +194,63 @@ function handleSubjectiveSubmit() {
 
 // 모드 선택 UI 로직
 function setupModeSelection() {
-    const btnModeMix = document.getElementById('btn-mode-mix');
-    const btnModeSingle = document.getElementById('btn-mode-single');
-    const danSelect = document.getElementById('dan-select');
+    const btnModeMixList = document.querySelectorAll('[data-bind="mode-mix"]');
+    const btnModeSingleList = document.querySelectorAll('[data-bind="mode-single"]');
+    const danSelectContainers = document.querySelectorAll('.dan-select');
     const danBtns = document.querySelectorAll('.dan-btn');
     
     // 유형 선택
-    const typeBtns = document.querySelectorAll('#btn-type-multiple, #btn-type-subjective, #btn-type-mixed');
+    const typeBtns = document.querySelectorAll('[data-bind-type]');
     typeBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            typeBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            questionType = btn.dataset.type;
+            const type = btn.getAttribute('data-bind-type');
+            questionType = type;
+            typeBtns.forEach(b => {
+                if(b.getAttribute('data-bind-type') === type) {
+                    b.classList.add('active');
+                } else {
+                    b.classList.remove('active');
+                }
+            });
         });
     });
     
+    function setGameMode(mode) {
+        gameMode = mode;
+        if (mode === 'mix') {
+            btnModeMixList.forEach(btn => btn.classList.add('active'));
+            btnModeSingleList.forEach(btn => btn.classList.remove('active'));
+            danSelectContainers.forEach(c => c.classList.add('hidden'));
+        } else {
+            btnModeSingleList.forEach(btn => btn.classList.add('active'));
+            btnModeMixList.forEach(btn => btn.classList.remove('active'));
+            danSelectContainers.forEach(c => c.classList.remove('hidden'));
+            if (!document.querySelector('.dan-btn.active')) {
+                setDan(2);
+            }
+        }
+    }
+
     // 전체 랜덤 모드 선택
-    btnModeMix.addEventListener('click', () => {
-        gameMode = 'mix';
-        btnModeMix.classList.add('active');
-        btnModeSingle.classList.remove('active');
-        danSelect.classList.add('hidden');
-    });
+    btnModeMixList.forEach(btn => btn.addEventListener('click', () => setGameMode('mix')));
     
     // 특정 단 선택 모드
-    btnModeSingle.addEventListener('click', () => {
-        gameMode = 'single';
-        btnModeSingle.classList.add('active');
-        btnModeMix.classList.remove('active');
-        danSelect.classList.remove('hidden');
-        // 기본 선택이 없으면 2단 선택
-        if (!document.querySelector('.dan-btn.active')) {
-            danBtns[0].classList.add('active');
-            selectedDan = 2;
-        }
-    });
+    btnModeSingleList.forEach(btn => btn.addEventListener('click', () => setGameMode('single')));
     
+    function setDan(dan) {
+        selectedDan = dan;
+        danBtns.forEach(btn => {
+            if (parseInt(btn.dataset.dan) === dan) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
     // 단수 버튼 클릭
     danBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            danBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedDan = parseInt(btn.dataset.dan);
-        });
+        btn.addEventListener('click', () => setDan(parseInt(btn.dataset.dan)));
     });
 }
 

@@ -21,12 +21,12 @@
                 <div class="mode-select">
                     <h3 class="mode-title">🎮 문제 범위 선택</h3>
                     <div class="mode-buttons">
-                        <button id="btn-mode-mix" class="mode-btn active" data-mode="mix">
+                        <button class="mode-btn active" data-bind="mode-mix">
                             <span class="mode-icon">🔀</span>
                             <span class="mode-label">전체 랜덤</span>
                             <span class="mode-desc">2~9단 섞기</span>
                         </button>
-                        <button id="btn-mode-single" class="mode-btn" data-mode="single">
+                        <button class="mode-btn" data-bind="mode-single">
                             <span class="mode-icon">🎯</span>
                             <span class="mode-label">단수 선택</span>
                             <span class="mode-desc">집중 연습</span>
@@ -34,7 +34,7 @@
                     </div>
 
                     <!-- 단수 선택 그리드 (단수 선택 모드일 때만 표시) -->
-                    <div id="dan-select" class="dan-select hidden">
+                    <div class="dan-select hidden">
                         <p class="dan-select-title">📐 연습할 단을 선택하세요</p>
                         <div class="dan-grid">
                             <button class="dan-btn" data-dan="2">2단</button>
@@ -50,15 +50,15 @@
 
                     <h3 class="mode-title" style="margin-top:20px;">📝 문제 유형 선택</h3>
                     <div class="mode-buttons">
-                        <button id="btn-type-multiple" class="mode-btn active" data-type="multiple">
+                        <button class="mode-btn active" data-bind-type="multiple">
                             <span class="mode-icon">☑️</span>
                             <span class="mode-label">객관식</span>
                         </button>
-                        <button id="btn-type-subjective" class="mode-btn" data-type="subjective">
+                        <button class="mode-btn" data-bind-type="subjective">
                             <span class="mode-icon">⌨️</span>
                             <span class="mode-label">주관식</span>
                         </button>
-                        <button id="btn-type-mixed" class="mode-btn" data-type="mixed">
+                        <button class="mode-btn" data-bind-type="mixed">
                             <span class="mode-icon">🔀</span>
                             <span class="mode-label">혼합</span>
                         </button>
@@ -76,6 +76,7 @@
                 <header class="top-bar">
                     <div class="stat"><span class="icon">❤️</span> <span id="player-hp">100</span> / 100</div>
                     <div class="stat"><span class="icon">🪙</span> <span id="player-gold">0</span></div>
+                    <button id="btn-open-settings" class="btn-primary" style="padding: 5px 15px; margin-top: 0; font-size: 0.9rem; width: auto; box-shadow: 0 4px 0 var(--primary-hover);">⚙️ 설정</button>
                 </header>
 
                 <div class="battle-arena">
@@ -140,6 +141,59 @@
                 </div>
             </aside>
         </main>
+
+        <!-- 인게임 설정 모달 -->
+        <div id="settings-modal" class="modal-overlay hidden">
+            <div class="modal-content glass-panel" style="background: rgba(255, 255, 255, 0.95);">
+                <header class="modal-header">
+                    <h2 style="color: var(--primary-color); margin: 0;">⚙️ 게임 설정</h2>
+                    <button id="btn-close-settings" class="btn-close">✖</button>
+                </header>
+                <div class="mode-select" style="margin-top: 0;">
+                    <h3 class="mode-title">🎮 문제 범위 변경</h3>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-bind="mode-mix">
+                            <span class="mode-icon">🔀</span>
+                            <span class="mode-label">전체 랜덤</span>
+                        </button>
+                        <button class="mode-btn" data-bind="mode-single">
+                            <span class="mode-icon">🎯</span>
+                            <span class="mode-label">단수 선택</span>
+                        </button>
+                    </div>
+
+                    <div class="dan-select hidden">
+                        <p class="dan-select-title">📐 연습할 단을 선택하세요</p>
+                        <div class="dan-grid">
+                            <button class="dan-btn" data-dan="2">2단</button>
+                            <button class="dan-btn" data-dan="3">3단</button>
+                            <button class="dan-btn" data-dan="4">4단</button>
+                            <button class="dan-btn" data-dan="5">5단</button>
+                            <button class="dan-btn" data-dan="6">6단</button>
+                            <button class="dan-btn" data-dan="7">7단</button>
+                            <button class="dan-btn" data-dan="8">8단</button>
+                            <button class="dan-btn" data-dan="9">9단</button>
+                        </div>
+                    </div>
+
+                    <h3 class="mode-title" style="margin-top:20px;">📝 문제 유형 변경</h3>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-bind-type="multiple">
+                            <span class="mode-icon">☑️</span>
+                            <span class="mode-label">객관식</span>
+                        </button>
+                        <button class="mode-btn" data-bind-type="subjective">
+                            <span class="mode-icon">⌨️</span>
+                            <span class="mode-label">주관식</span>
+                        </button>
+                        <button class="mode-btn" data-bind-type="mixed">
+                            <span class="mode-icon">🔀</span>
+                            <span class="mode-label">혼합</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 사운드 이펙트 (밝고 경쾌한 아케이드 톤으로 교체) -->
